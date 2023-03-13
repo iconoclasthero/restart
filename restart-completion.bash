@@ -8,7 +8,7 @@ _restart_complete()
   prev=${COMP_WORDS[COMP_CWORD-1]}
 
   if [ $COMP_CWORD -eq 1 ]; then
-    COMPREPLY=( $(compgen -W "alsa bind bind9 deluge deluged icecast mpd network networking nfs now pulse pulseaudio serviio shout minidlna" -- $cur) )
+    COMPREPLY=( $(compgen -W "alsa bind bind9 chrome deluged edit icecast mpd network networking nfs now pipewire pulseaudio serviio shout minidlna" -- $cur) )
   elif [ $COMP_CWORD -eq 2 ]; then
     case "$prev" in
       "minidlna")

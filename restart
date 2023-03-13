@@ -8,7 +8,7 @@ function error(){
  printf "Recognized commands are: \nalsa \nbind[9] \nchrome \ndeluge[d] \ndocker \nedit \nice[cast][2] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnow \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
-   case $ncq in
+   case "$ncq" in
 	nano ) nano /home/bvargo/bin/restart ; break;;
 	code ) code /home/bvargo/bin/restart ; break;;
 	quit ) echo "Done." ; break;;
@@ -24,39 +24,34 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-function pause(){
-   read -p "$*"
-}
-
 editscript "$1"
 
-
-if [ $# -eq 0 ]; then
+if [ "$#" -eq 0 ]; then
  error
 
  ##A
-elif [ $1 = "alsa" ]; then
+elif [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils restart
  sudo alsa force-reload
  sudo /etc/init.d/alsa-utils status
 
 ##B
-elif [ $1 = "bind" ] || [ $1 = "bind9" ]; then
+elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then
  sudo systemctl restart bind9.service
  /bin/sleep 3
  systemctl status bind9.service
 
 ##C
-elif [ $1 = "chrome" ] ; then
+elif [ "$1" = "chrome" ] ; then
 pkill chrome
 
 
 ##D
 
-elif [ $1 = "docker" ] || [ $1 = "dockerd" ]; then
+elif [ "$1" = "docker" ] || [ "$1" = "dockerd" ]; then
  sudo /usr/bin/systemctl restart docker
 
-elif [ $1 = "deluge" ] || [ $1 = "deluged" ]; then
+elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
  sudo systemctl restart deluged
 # sudo pkill -9 deluged
 # screen sudo -u deluge -g media deluged -d -c /var/lib/deluged/config -l /var/log/deluged/daemon.log -L debug
@@ -64,7 +59,7 @@ elif [ $1 = "deluge" ] || [ $1 = "deluged" ]; then
  systemctl status deluged
  sudo ps -A |grep deluged
 
-#elif [ $1 = "deluge" ] || [ $1 = "deluged" ]; then
+#elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
 ## sudo systemctl stop deluged
 # sudo pkill -9 deluged
 # screen sudo -u deluge -g media deluged -d -c /var/lib/deluged/config -l /var/log/deluged/daemon.log -L debug
@@ -72,34 +67,34 @@ elif [ $1 = "deluge" ] || [ $1 = "deluged" ]; then
 # sudo ps -A |grep deluged
 
 ##E
-elif [ $1 = "edit" ]; then
+elif [ "$1" = "edit" ]; then
  nano /home/bvargo/bin/restart
 
 ##I
-elif [ $1 = "ice" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
-elif [ $1 = "icecast" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
-elif [ $1 = "icecast2" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
+elif [ "$1" = "ice" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
+elif [ "$1" = "icecast" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
+elif [ "$1" = "icecast2" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
 
 
 ##M
-elif [ $1 = "minidlna" ]; then
+elif [ "$1" = "minidlna" ]; then
  echo "minidlna:  restart or force-reload?"
  select rfs in "restart" "force-reload" "scan"; do
-   case $rfs in
+   case "$rfs" in
 	restart ) sudo systemctl restart minidlna ; systemctl status minidlna; break ;;
 	force-reload ) ls -alF /var/lib/minidlna/files.db; sudo systemctl force-reload minidlna ; systemctl status minidlna; ls -alF /var/lib/minidlna/files.db; break ;;
         scan ) sudo minidlnad -r;  break ;;
    esac
  done
 
-elif [ $1 = "mpd" ]; then
+elif [ "$1" = "mpd" ]; then
  sudo systemctl restart mpd ; systemctl status mpd
 
 ##N
-#elif [ $1 = "network" ] || [ $1 = "networking" ] || [ $1 = "network manager" ]; then sudo systemctl restart network-manager.service
-elif [ $1 = "network" ] || [ $1 = "networking" ] || [ $1 = "network manager" ]; then screen bash -c 'sudo nmcli networking off; /usr/bin/sleep 1s; sudo nmcli networking on; exit'
+#elif [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then sudo systemctl restart network-manager.service
+elif [ "$1" = "net" ] || [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then screen bash -c 'sudo nmcli networking off; /usr/bin/sleep 1s; sudo nmcli networking on; exit'
 
-elif [ $1 = "nfs" ]; then
+elif [ "$1" = "nfs" ]; then
      if ! [[ -d /dev/shm/cache ]]
      then
         mkdir /dev/shm/cache
@@ -110,31 +105,31 @@ elif [ $1 = "nfs" ]; then
  sudo systemctl status nfs-kernel-server
 # sudo /etc/init.d/nfs-kernel-server restart
 
-elif [ $1 = "now" ]; then
+elif [ "$1" = "now" ]; then
  sudo reboot now
 
 ##P
-elif [ $1 = "pipe" ] || [ $1 = "pipewire" ] || [ $1 = "pipewire-pulseaudio" ]; then
+elif [ "$1" = "pipe" ] || [ "$1" = "pipewire" ] || [ "$1" = "pipewire-pulseaudio" ]; then
  /usr/bin/systemctl --user restart pipewire
 
-elif [ $1 = "pulse" ] || [ $1 = "pulseaudio" ] || [ $1 = "pulse-audio" ]; then
+elif [ "$1" = "pulse" ] || [ "$1" = "pulseaudio" ] || [ "$1" = "pulse-audio" ]; then
  sudo killall pulseaudio
  pulseaudio -k
  pulseaudio --start
 
 ##S
-elif [ $1 = "serviio" ]; then
+elif [ "$1" = "serviio" ]; then
  sudo systemctl stop serviio.service
  sudo systemctl start serviio.service
  sudo systemctl status serviio.service
 
-elif [ $1 = "shout" ]; then #https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/
+elif [ "$1" = "shout" ]; then #https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/
 # echo "Attempting 'sudo killall sc_serv && sudo sc_serv &,' if it doesn't work try restarting mpd.  See also (https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/): "
 # sudo killall sc_serv && sudo sc_serv &
  printf "There is no shoutcast server on this machine; restarting icecast server instead!"
  sudo systemctl restart icecast2.service #restart mpd
 
-elif [ $1 = "sshd" ] || [ $1 = "ssh" ]; then
+elif [ "$1" = "sshd" ] || [ "$1" = "ssh" ]; then
  sudo systemctl restart sshd.service
  sudo systemctl status sshd.service
  sudo systemctl restart ssh.service
@@ -152,4 +147,4 @@ else
 ##	quit ) echo "Done." ; break;;
 # #  esac
 # #done
-fi;
+fi

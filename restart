@@ -8,7 +8,7 @@ scriptname=$(realpath "$0")
 #Functions
 function error(){
  #read -p "$*"
- printf "Recognized commands are: \nabs \nalsa \napache[2] \naudiobookshelf \nbind[9] \nchrome \ndeluge-gtk \ndeluge[d] \ndocker \nedit \nice[cast][2] \njelly[fin] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnginx/ngnix \nnow \npicard \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
+ printf "Recognized commands are: \nabs \nalsa \napache[2] \naudiobookshelf \nbind[9] \nchrome \ndeluge-gtk \ndeluge[d] \ndocker \nedit \ngig[abyte] \nice[cast][2] \njelly[fin] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnginx/ngnix \nnow \npicard \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
@@ -29,15 +29,20 @@ fi
 
 . "$restartrc"
 
-[[ "$(uname -n)" != "server" ]] && REMOTE="ssh -p $sshport $server"
+[[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
 
 editscript "$1"
 
-if [[ "$#" -eq 0 ]]; then
- error
+[[ "$#" -eq 0 ]] &&  error
+
+##G
+# restart gigabyte
+[[ "$1" =~ ^(gig|gigabyte)$ ]] && ${REMOTE:-} sudo reboot now
+
+
 
  ##A
-elif [ "$1" = "alsa" ]; then
+if [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils restart
  sudo alsa force-reload
  sudo /etc/init.d/alsa-utils status
@@ -104,6 +109,11 @@ elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
 ##E
 elif [ "$1" = "edit" ]; then
  nano "$HOME"/bin/restart
+
+##G
+#elif [[ "$1" =~ ^(gig|gigabyte)$ ]]
+# then
+#   echo sudo reboot now
 
 ##I
 elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
@@ -192,8 +202,8 @@ elif [ "$1" = "sshd" ] || [ "$1" = "ssh" ]; then
  sudo systemctl status ssh.service
 
 else
- printf "Command not found!\n"
- error
+  printf "Command not found!\n"
+  error
 # #echo "Recognized commands are alsa, shout, deluge(d), minidlna (restart or force-reload), network/networking/network manager, nfs, now, pulse(audio)..."
 # #echo "Edit this script in nano, code, or quit?"
 # #select ncq in "nano" "code" "quit"; do
@@ -204,3 +214,4 @@ else
 # #  esac
 # #done
 fi
+

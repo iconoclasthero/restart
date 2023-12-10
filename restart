@@ -37,7 +37,7 @@ editscript "$1"
 
 ##G
 # restart gigabyte
-[[ "$1" =~ ^(gig|gigabyte)$ ]] && ${REMOTE:-} sudo reboot now
+[[ "$1" =~ ^(gig|gigabyte)$ ]] && ${REMOTE:-} sudo reboot now; exit
 
 
 

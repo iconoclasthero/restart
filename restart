@@ -158,8 +158,10 @@ elif [[ "$1" = "picard" ]]; then
  docker stop picard
  docker start picard
 
-elif [ "$1" = "pipe" ] || [ "$1" = "pipewire" ] || [ "$1" = "pipewire-pulseaudio" ]; then
+elif [[ "$1" = "pipe" ]] || [[ "$1" = "pipewire" ]] || [[ "$1" = "pipewire-pulseaudio" ]]; then
  /usr/bin/systemctl --user restart pipewire
+ /usr/bin/systemctl --user status pipewire
+
 
 elif [ "$1" = "pulse" ] || [ "$1" = "pulseaudio" ] || [ "$1" = "pulse-audio" ]; then
  sudo killall pulseaudio

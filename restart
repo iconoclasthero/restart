@@ -1,7 +1,11 @@
 #!/bin/bash
-
 # Server information stored in ~/.config/restart/restartrc:
-restartrc="$HOME/.config/restart/restartrc"
+config="$HOME/.config/restart/restartrc"
+
+[[ ! -f "$config" ]] && mkdir -p "${config%\/*}" && touch "$config" && \
+  printf '#\n# Enter server info:\n#\n# servername=<servername>\n# server=<server url>\n# sshport=<sshport - cannot be blank>\n\n# If your server port is 22 find out why it should not be and change it.\n' |tee "$config" && \
+  printf 'Edit config file before rerunning.' && \
+  exit
 
 scriptname=$(realpath "$0")
 
@@ -12,8 +16,8 @@ function error(){
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
-	nano ) nano "$HOME"/bin/restart ; break;;
-	code ) code "$HOME"/bin/restart ; break;;
+	nano ) nano "$scriptname" ; break;;
+	code ) code "$scriptname" ; break;;
 	quit ) echo "Done." ; break;;
    esac
  done
@@ -27,21 +31,26 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-. "$restartrc"
+remotefn() {
+[[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
+printf '\nssh server name: %s\nssh server port: %s\n        ssh url: %s\n  REMOTE PREFIX: %s\n\n\n' "$servername" "$sshport" "$server" "$REMOTE"
+}
+
+editscript "$1"
+
+
+. "$config"
 
 [[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
 
-editscript "$1"
 
 [[ "$#" -eq 0 ]] &&  error
 
 ##G
 # restart gigabyte
-[[ "$1" =~ ^(gig|gigabyte)$ ]] && ${REMOTE:-} sudo reboot now; exit
+[[ "$1" =~ ^(gig|gigabyte)$ ]] && ${REMOTE:-} sudo reboot now && wall "System will be shutting down forthwith..." && exit
 
-
-
- ##A
+##A
 if [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils restart
  sudo alsa force-reload
@@ -52,8 +61,7 @@ elif [[ "$1" = "apache" ]] || [[ "$1" = "apache2" ]]; then
  systemctl status apache2
 
 elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
- ${REMOTE:-} sudo systemctl restart audiobookshelf
- ${REMOTE:-} systemctl status audiobookshelf
+ remotefn && ${REMOTE:-} sudo systemctl restart audiobookshelf; status audiobookshelf
 
 # ssh -p "$sshport" "$server" systemctl status audiobookshelf
 
@@ -118,8 +126,10 @@ elif [ "$1" = "edit" ]; then
 ##I
 elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
  then
-   $REMOTE sudo systemctl restart icecast2.service
-   $REMOTE systemctl status icecast2.service; restart mpd
+   ${REMOTE:-} sudo systemctl restart icecast2.service
+   status icecast
+   restart mpd
+   play
 
 #echo yes
 #elif [[ "$1" == "ice" ]] || [[ "$1" == "icecast" ]] || [[ "$1" == "icecast2" ]];

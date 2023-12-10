@@ -101,11 +101,14 @@ elif [ "$1" = "edit" ]; then
  nano "$HOME"/bin/restart
 
 ##I
-elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]] && $REMOTE sudo systemctl restart icecast2.service; $REMOTE systemctl status icecast2.service; restart mpd
+elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
+ then
+   $REMOTE sudo systemctl restart icecast2.service
+   $REMOTE systemctl status icecast2.service; restart mpd
 
 #echo yes
-#elif [[ "$1" == "ice" ]] || [[ "$1" == "icecast" ]] || [[ "$1" == "icecast2" ]]; 
-#then 
+#elif [[ "$1" == "ice" ]] || [[ "$1" == "icecast" ]] || [[ "$1" == "icecast2" ]];
+#then
 
 ##J
 elif [[ "$1" == "jelly" ]] || [[ "$1" == "jellyfin" ]]; then ssh 192.168.1.2:"$HOME"/bin/restart jellyfin

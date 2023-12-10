@@ -9,8 +9,8 @@ function error(){
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
-	nano ) nano /home/bvargo/bin/restart ; break;;
-	code ) code /home/bvargo/bin/restart ; break;;
+	nano ) nano "$HOME"/bin/restart ; break;;
+	code ) code "$HOME"/bin/restart ; break;;
 	quit ) echo "Done." ; break;;
    esac
  done
@@ -24,7 +24,7 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-[[ "$(uname -n)" != "gigabyte" ]] && REMOTE="ssh -p $gigsshport $gigabyte"
+[[ "$(uname -n)" != "server" ]] && REMOTE="ssh -p $servsshport $server"
 
 editscript "$1"
 
@@ -45,7 +45,7 @@ elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs"
  ${REMOTE:-} sudo systemctl restart audiobookshelf
  ${REMOTE:-} systemctl status audiobookshelf
 
-# ssh -p "$gigsshport" "$gigabyte" systemctl status audiobookshelf
+# ssh -p "$servsshport" "$server" systemctl status audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then
@@ -98,7 +98,7 @@ elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
 
 ##E
 elif [ "$1" = "edit" ]; then
- nano /home/bvargo/bin/restart
+ nano "$HOME"/bin/restart
 
 ##I
 elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]] && $REMOTE sudo systemctl restart icecast2.service; $REMOTE systemctl status icecast2.service; restart mpd
@@ -108,7 +108,7 @@ elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]] && $REMOTE sudo systemctl restart ic
 #then 
 
 ##J
-elif [[ "$1" == "jelly" ]] || [[ "$1" == "jellyfin" ]]; then ssh 192.168.1.2:/home/bvargo/bin/restart jellyfin
+elif [[ "$1" == "jelly" ]] || [[ "$1" == "jellyfin" ]]; then ssh 192.168.1.2:"$HOME"/bin/restart jellyfin
 
 
 ##M
@@ -135,7 +135,7 @@ elif [ "$1" = "nfs" ]; then
      if ! [[ -d /dev/shm/cache ]]
      then
         mkdir /dev/shm/cache
-        chown bvargo:media /dev/shm/cache
+        chown "$USER":media /dev/shm/cache
      fi
  sudo systemctl daemon-reload
  sudo systemctl restart nfs-kernel-server
@@ -188,8 +188,8 @@ else
 # #echo "Edit this script in nano, code, or quit?"
 # #select ncq in "nano" "code" "quit"; do
 # #  case $ncq in
-##	nano ) nano /home/bvargo/bin/restart ; break;;
-##	code ) code /home/bvargo/bin/restart ; break;;
+##	nano ) nano "$HOME"/bin/restart ; break;;
+##	code ) code "$HOME"/bin/restart ; break;;
 ##	quit ) echo "Done." ; break;;
 # #  esac
 # #done

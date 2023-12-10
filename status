@@ -16,8 +16,8 @@ function error(){
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
-	nano ) nano /home/bvargo/bin/restart ; break;;
-	code ) code /home/bvargo/bin/restart ; break;;
+	nano ) nano "$scriptname" ; break;;
+	code ) code "$scriptname" ; break;;
 	quit ) echo "Done." ; break;;
    esac
  done

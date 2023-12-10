@@ -31,16 +31,23 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-. "$config"
-echo "$sshport" "$server"
-
-
-unset REMOTE
-[[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
-printf "\n\n\n##### REMOTE= $REMOTE\n\n\n"
-
+##############
 
 editscript "$1"
+
+##############
+
+. "$config"
+
+#unset REMOTE
+
+[[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
+
+printf '\nssh server name: %s\nssh server port: %s\n        ssh url: %s\n  REMOTE PREFIX: %s\n\n\n' "$servername" "$sshport" "$server" "$REMOTE"
+
+#printf "\n\n\n##### REMOTE= $REMOTE\n\n\n"
+
+
 
 if [ "$#" -eq 0 ]; then
  error

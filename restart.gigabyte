@@ -1,11 +1,11 @@
 #!/bin/bash
-
+gigabyte="-p 1129 ssh.brianvargo.com"
 scriptname=$(realpath "$0")
 
 #Functions
 function error(){
  #read -p "$*"
- printf "Recognized commands are: \nabs \nalsa \napache[2] \naudiobookshelf \nbind[9] \nchrome \ndeluge-gtk \ndeluge[d] \ndocker \nedit \nice[cast][2] \njelly[fin] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnginx/ngnix \nnow \npicard \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
+ printf "Recognized commands are: \nalsa \nbind[9] \nchrome \ndeluge[d] \ndocker \nedit \nice[cast][2] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnow \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
@@ -24,11 +24,9 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-[[ "$(uname -n)" != "gigabyte" ]] && REMOTE="ssh -p $gigsshport $gigabyte"
-
 editscript "$1"
 
-if [[ "$#" -eq 0 ]]; then
+if [ "$#" -eq 0 ]; then
  error
 
  ##A
@@ -36,16 +34,6 @@ elif [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils restart
  sudo alsa force-reload
  sudo /etc/init.d/alsa-utils status
-
-elif [[ "$1" = "apache" ]] || [[ "$1" = "apache2" ]]; then
- sudo systemctl restart apache2
- systemctl status apache2
-
-elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
- ${REMOTE:-} sudo systemctl restart audiobookshelf
- ${REMOTE:-} systemctl status audiobookshelf
-
-# ssh -p "$gigsshport" "$gigabyte" systemctl status audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then
@@ -55,39 +43,21 @@ elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then
 
 ##C
 elif [ "$1" = "chrome" ] ; then
-/usr/bin/pkill --oldest --signal TERM -f chrome
-#if $( ps -A|grep chrome )
-while [[ $(ps -A|grep -c chrome) -gt 0 ]] && [[ "$n" -lt 7 ]]; do printf "...chrome still shittig down..." && \sleep 5s; done
-nohup chrome
+pkill chrome
 
 
 ##D
 
 elif [ "$1" = "docker" ] || [ "$1" = "dockerd" ]; then
- sudo /usr/bin/systemctl restart docker; docker start picard
-
-#elif [ "$1" = "docker" ]; then
-# echo "docker:  restart or stop-start Picard?"
-# select rfs in "restart" "picard" ; do
-#   case "$rfs" in
-#	restart ) sudo /usr/bin/systemctl restart docker ; docker start picard; break ;;
-#	picard ) docker stop picard; docker start picard ; break ;;
-##	force-reload ) ls -alF /var/lib/minidlna/files.db; sudo systemctl force-reload minidlna ; systemctl status minidlna; ls -alF /var/lib/minidlna/files.db; break ;;
-##        scan ) sudo minidlnad -r;  break ;;
-#   esac
-
-
-elif [[ "$1" = "deluge-gtk" ]]; then
-pkill -9 deluge-gtk
-deluge-gtk &!
+ssh $gigabyte sudo /usr/bin/systemctl restart docker
 
 elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
- sudo systemctl restart deluged
+ssh $gigabyte sudo systemctl restart deluged
 # sudo pkill -9 deluged
 # screen sudo -u deluge -g media deluged -d -c /var/lib/deluged/config -l /var/log/deluged/daemon.log -L debug
 # sudo systemctl start deluged
- systemctl status deluged
- sudo ps -A |grep deluged
+ssh $gigabyte systemctl status deluged
+ssh $gigabyte sudo ps -A |grep deluged
 
 #elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
 ## sudo systemctl stop deluged
@@ -98,17 +68,12 @@ elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
 
 ##E
 elif [ "$1" = "edit" ]; then
- nano /home/bvargo/bin/restart
+ssh $gigabyte nano /home/bvargo/bin/restart
 
 ##I
-elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]] && $REMOTE sudo systemctl restart icecast2.service; $REMOTE systemctl status icecast2.service; restart mpd
-
-#echo yes
-#elif [[ "$1" == "ice" ]] || [[ "$1" == "icecast" ]] || [[ "$1" == "icecast2" ]]; 
-#then 
-
-##J
-elif [[ "$1" == "jelly" ]] || [[ "$1" == "jellyfin" ]]; then ssh 192.168.1.2:/home/bvargo/bin/restart jellyfin
+elif [ "$1" = "ice" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
+elif [ "$1" = "icecast" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
+elif [ "$1" = "icecast2" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
 
 
 ##M
@@ -123,13 +88,11 @@ elif [ "$1" = "minidlna" ]; then
  done
 
 elif [ "$1" = "mpd" ]; then
- ${REMOTE:-} sudo systemctl restart mpd
- ${REMOTE:-} systemctl status mpd
+ sudo systemctl restart mpd ; systemctl status mpd
 
 ##N
 #elif [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then sudo systemctl restart network-manager.service
-elif [ "$1" = "net" ] || [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then
-  screen bash -c 'sudo nmcli networking off; /usr/bin/sleep 1s; sudo nmcli networking on; exit'
+elif [ "$1" = "net" ] || [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then screen bash -c 'sudo nmcli networking off; /usr/bin/sleep 1s; sudo nmcli networking on; exit'
 
 elif [ "$1" = "nfs" ]; then
      if ! [[ -d /dev/shm/cache ]]
@@ -142,19 +105,10 @@ elif [ "$1" = "nfs" ]; then
  sudo systemctl status nfs-kernel-server
 # sudo /etc/init.d/nfs-kernel-server restart
 
-elif [ "$1" = "nginx" ] || [ "$1" = "ngnix" ]; then
-     sudo systemctl restart nginx
-     systemctl status nginx
-
 elif [ "$1" = "now" ]; then
  sudo reboot now
 
 ##P
-
-elif [[ "$1" = "picard" ]]; then
- docker stop picard
- docker start picard
-
 elif [ "$1" = "pipe" ] || [ "$1" = "pipewire" ] || [ "$1" = "pipewire-pulseaudio" ]; then
  /usr/bin/systemctl --user restart pipewire
 

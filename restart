@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Server information stored in ~/.config/restart/restartrc:
+restartrc="$HOME/.config/restart/restartrc"
+
 scriptname=$(realpath "$0")
 
 #Functions
@@ -24,7 +27,9 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-[[ "$(uname -n)" != "server" ]] && REMOTE="ssh -p $servsshport $server"
+. "$restartrc"
+
+[[ "$(uname -n)" != "server" ]] && REMOTE="ssh -p $sshport $server"
 
 editscript "$1"
 
@@ -45,7 +50,7 @@ elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs"
  ${REMOTE:-} sudo systemctl restart audiobookshelf
  ${REMOTE:-} systemctl status audiobookshelf
 
-# ssh -p "$servsshport" "$server" systemctl status audiobookshelf
+# ssh -p "$sshport" "$server" systemctl status audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then

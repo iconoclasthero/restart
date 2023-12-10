@@ -1,6 +1,8 @@
-# 
-# Change to your valuses.  default location is ~/.config/restart/restartrc and i symlinked to ~/.ssh since there's ssh server stuff there too
 #
-# server=address+of+remote+server
-# sshport=port+of+remote+server
+# Enter server info:
+#
+# servername=<servername>
+# server=<server url>
+# sshport=<sshport - cannot be blank>
 
+# If your server port is 22 find out why it should not be and change it.

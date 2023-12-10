@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Server config information stored in ~/.config/restart/restartrc so that it is not stored in here...
-config="~/.config/restart/restartrc"
+config="$HOME/.config/restart/restartrc"
+[[ ! -f "$config" ]] && mkdir -p "${config%\/*}" && touch "$config" && \
+  printf '#\n# Enter server info:\n#\n# servername=<servername>\n# server=<server url>\n# sshport=<sshport - cannot be blank>\n\n# If your server port is 22 find out why it should not be and change it.\n' |tee "$config" && \
+  printf 'Edit config file before rerunning.' && \
+  exit
 
 scriptname=$(realpath "$0")
 
@@ -27,13 +31,13 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
-[[ ! -f "$config" ]] && mkdir -p "${config%\/*}"; touch "$config"
 . "$config"
 echo "$sshport" "$server"
 
 
-[[ "$(uname -n)" != "$server" ]] && REMOTE="ssh -p $sshport $server"
-echo "$REMOTE"
+unset REMOTE
+[[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
+printf "\n\n\n##### REMOTE= $REMOTE\n\n\n"
 
 
 editscript "$1"
@@ -48,7 +52,7 @@ elif [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils status
 
 elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
- ${REMOTE:-} systemctl status audiobookshelf
+echo "${REMOTE:-}systemctl status audiobookshelf"
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then

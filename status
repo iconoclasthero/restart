@@ -41,9 +41,11 @@ editscript "$1"
 
 #unset REMOTE
 
+remotefn() {
 [[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
-
 printf '\nssh server name: %s\nssh server port: %s\n        ssh url: %s\n  REMOTE PREFIX: %s\n\n\n' "$servername" "$sshport" "$server" "$REMOTE"
+}
+
 
 #printf "\n\n\n##### REMOTE= $REMOTE\n\n\n"
 
@@ -59,7 +61,7 @@ elif [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils status
 
 elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
-${REMOTE:-} systemctl status audiobookshelf
+ remotefn && ${REMOTE:-} systemctl status audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then

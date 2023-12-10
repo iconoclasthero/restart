@@ -1,11 +1,13 @@
 #!/bin/bash
 
+# Server config information stored in ~/.config/restart/restartrc so that it is not stored in here...
+
 scriptname=$(realpath "$0")
 
 #Functions
 function error(){
  #read -p "$*"
- printf "Recognized commands are: \nalsa \nbind[9] \nchrome \ndeluge[d] \ndocker \nedit \nice[cast][2] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnow \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
+ printf "Recognized commands are: \nalsa \naudio[bookshelf] - abs \nbind[9] \nchrome \ndeluge[d] \ndocker \nedit \nice[cast][2] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnow \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
@@ -24,6 +26,12 @@ if [[ "$1" == "edit" ]]; then
 fi
 }
 
+. ~/.config/restart/restartrc
+
+[[ "$(uname -n)" != "$server" ]] && REMOTE="ssh -p $sshport $server"
+
+
+
 editscript "$1"
 
 if [ "$#" -eq 0 ]; then
@@ -34,6 +42,9 @@ elif [ "$1" = "alsa" ]; then
 # sudo /etc/init.d/alsa-utils restart
 # sudo alsa force-reload
  sudo /etc/init.d/alsa-utils status
+
+elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
+ ${REMOTE:-} systemctl status audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then
@@ -50,11 +61,11 @@ sudo ps -A|grep chrome
 
 elif [ "$1" = "docker" ] || [ "$1" = "dockerd" ]; then
  #sudo /usr/bin/systemctl restart docker
- sudo /usr/bin/systemctl status docker
+ sudo /usr/bin/systemctl restart docker
 
 
 elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
-# sudo systemctl status deluged
+# sudo systemctl restart deluged
  systemctl status deluged
  sudo ps -A |grep deluged
 
@@ -67,22 +78,22 @@ elif [ "$1" = "deluge" ] || [ "$1" = "deluged" ]; then
 
 ##E
 elif [ "$1" = "edit" ]; then
- nano /home/bvargo/bin/status
+ nano /home/bvargo/bin/restart
 
 ##I
 elif [[ "$1" = "ice" ]] || [[ "$1" =~ "icecast" ]]; then
   systemctl status icecast
   systemctl status mpd
-#sudo systemctl status icecast2.service; systemctl status icecast2.service #; status mpd
-#elif [ "$1" = "icecast" ]; then sudo systemctl status icecast2.service; systemctl status icecast2.service; status mpd
-#elif [ "$1" = "icecast2" ]; then sudo systemctl status icecast2.service; systemctl status icecast2.service; status mpd
+#sudo systemctl restart icecast2.service; systemctl status icecast2.service #; restart mpd
+#elif [ "$1" = "icecast" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
+#elif [ "$1" = "icecast2" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
 
 
 ##M
 elif [ "$1" = "minidlna" ]; then
- echo "minidlna: status  restart, force-reload, scan?"
+ echo "minidlna:  restart or force-reload?"
  select rfs in "status" "restart" "force-reload" "scan"; do
-   case "$rfsc" in
+   case "$rfs" in
 	status ) systemctl status minidlna; break ;;
 	restart ) sudo systemctl restart minidlna ; systemctl status minidlna; break ;;
 	force-reload ) ls -alF /var/lib/minidlna/files.db; sudo systemctl force-reload minidlna ; systemctl status minidlna; ls -alF /var/lib/minidlna/files.db; break ;;
@@ -91,11 +102,11 @@ elif [ "$1" = "minidlna" ]; then
  done
 
 elif [ "$1" = "mpd" ]; then
-# sudo systemctl status mpd ;
+# sudo systemctl restart mpd ;
 systemctl status mpd
 
 ##N
-#elif [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then sudo systemctl status network-manager.service
+#elif [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then sudo systemctl restart network-manager.service
 #elif [ "$1" = "net" ] || [ "$1" = "network" ] || [ "$1" = "networking" ] || [ "$1" = "network manager" ]; then screen bash -c 'sudo nmcli networking off; /usr/bin/sleep 1s; sudo nmcli networking on; exit'
 
 elif [ "$1" = "nfs" ]; then
@@ -105,11 +116,11 @@ elif [ "$1" = "nfs" ]; then
 #        chown bvargo:media /dev/shm/cache
 #     fi
 # sudo systemctl daemon-reload
-# sudo systemctl status nfs-kernel-server
+# sudo systemctl restart nfs-kernel-server
  sudo systemctl status nfs-kernel-server
  printf "$ ls -ltr /dev/shm/cache: \n"
  ls -ltr /dev/shm/cache
-# sudo /etc/init.d/nfs-kernel-server status
+# sudo /etc/init.d/nfs-kernel-server restart
 
 #elif [ "$1" = "now" ]; then
 # sudo reboot now
@@ -131,27 +142,27 @@ elif [ "$1" = "serviio" ]; then
  sudo systemctl status serviio.service
 
 elif [ "$1" = "shout" ]; then #https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/
-# echo "Attempting 'sudo killall sc_serv && sudo sc_serv &,' if it doesn't work try statusing mpd.  See also (https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/): "
+# echo "Attempting 'sudo killall sc_serv && sudo sc_serv &,' if it doesn't work try restarting mpd.  See also (https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/): "
 # sudo killall sc_serv && sudo sc_serv &
  printf "There is no shoutcast server on this machine; status of icecast server instead!"
  systemctl status icecast2.service
-# sudo systemctl status icecast2.service #status mpd
+# sudo systemctl restart icecast2.service #restart mpd
 
 elif [ "$1" = "sshd" ] || [ "$1" = "ssh" ]; then
-# sudo systemctl status sshd.service
+# sudo systemctl restart sshd.service
  sudo systemctl status sshd.service
-# sudo systemctl status ssh.service
+# sudo systemctl restart ssh.service
  sudo systemctl status ssh.service
 
 else
  printf "Command not found!\n"
  error
-# #echo "Recognized commands are alsa, shout, deluge(d), minidlna (status or force-reload), network/networking/network manager, nfs, now, pulse(audio)..."
+# #echo "Recognized commands are alsa, shout, deluge(d), minidlna (restart or force-reload), network/networking/network manager, nfs, now, pulse(audio)..."
 # #echo "Edit this script in nano, code, or quit?"
 # #select ncq in "nano" "code" "quit"; do
 # #  case $ncq in
-##	nano ) nano /home/bvargo/bin/status ; break;;
-##	code ) code /home/bvargo/bin/status ; break;;
+##	nano ) nano /home/bvargo/bin/restart ; break;;
+##	code ) code /home/bvargo/bin/restart ; break;;
 ##	quit ) echo "Done." ; break;;
 # #  esac
 # #done

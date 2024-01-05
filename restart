@@ -12,7 +12,7 @@ scriptname=$(realpath "$0")
 #Functions
 function error(){
  #read -p "$*"
- printf "Recognized commands are: \nabs \nalsa \napache[2] \naudiobookshelf \nbind[9] \nchrome \ndeluge-gtk \ndeluge[d] \ndocker \nedit \ngig[abyte] \nice[cast][2] \njelly[fin] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnginx/ngnix \nnow \npicard \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
+ printf "Recognized commands are: \nabs \nalsa \napache[2] \naudiobookshelf \nbind[9] \nchrome \ndeluge-gtk \ndeluge[d] \ndocker \nedit \ngig[abyte] \nice[cast][2] \njelly[fin] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnginx/ngnix \nnow \npicard \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \nsystemd \n\n"
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
@@ -33,7 +33,7 @@ fi
 
 remotefn() {
 [[ "$(uname -n)" != "$servername" ]] && REMOTE="ssh -p $sshport $server"
-printf '\nssh server name: %s\nssh server port: %s\n        ssh url: %s\n  REMOTE PREFIX: %s\n\n\n' "$servername" "$sshport" "$server" "$REMOTE"
+#printf '\nssh server name: %s\nssh server port: %s\n        ssh url: %s\n  REMOTE PREFIX: %s\n\n\n' "$servername" "$sshport" "$server" "$REMOTE"
 }
 
 editscript "$1"
@@ -61,7 +61,9 @@ elif [[ "$1" = "apache" ]] || [[ "$1" = "apache2" ]]; then
  systemctl status apache2
 
 elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
- remotefn && ${REMOTE:-} sudo systemctl restart audiobookshelf; status audiobookshelf
+# remotefn && ${REMOTE:-} sudo systemctl restart audiobookshelf; status audiobookshelf
+remotefn
+${REMOTE:-} docker compose -f ~/bin/docker/audiobookshelf/compose.yaml down && ${REMOTE:-} docker compose -f ~/bin/docker/audiobookshelf/compose.yaml pull && ${REMOTE:-} docker compose -f ~/bin/docker/audiobookshelf/compose.yaml up -d; status audiobookshelf
 
 # ssh -p "$sshport" "$server" systemctl status audiobookshelf
 
@@ -127,7 +129,7 @@ elif [ "$1" = "edit" ]; then
 elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
  then
    ${REMOTE:-} sudo systemctl restart icecast2.service
-   status icecast
+   status icecast2
    restart mpd
    play
 
@@ -205,11 +207,14 @@ elif [ "$1" = "shout" ]; then #https://www.howtoforge.com/tutorial/ubuntu-shoutc
  printf "There is no shoutcast server on this machine; restarting icecast server instead!"
  sudo systemctl restart icecast2.service #restart mpd
 
-elif [ "$1" = "sshd" ] || [ "$1" = "ssh" ]; then
+elif [[ "$1" = "sshd" ]] || [[ "$1" = "ssh" ]]; then
  sudo systemctl restart sshd.service
  sudo systemctl status sshd.service
  sudo systemctl restart ssh.service
  sudo systemctl status ssh.service
+
+elif [[ "$1" == "systemd" ]]; then
+ sudo systemctl daemon-reload
 
 else
   printf "Command not found!\n"

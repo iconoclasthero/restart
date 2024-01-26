@@ -61,7 +61,8 @@ elif [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils status
 
 elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
- remotefn && ${REMOTE:-} systemctl status audiobookshelf
+# remotefn && ${REMOTE:-} systemctl status audiobookshelf
+ remotefn && ${REMOTE:-} docker ps |grep audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then
@@ -99,7 +100,7 @@ elif [ "$1" = "edit" ]; then
 
 ##I
 elif [[ "$1" = "ice" ]] || [[ "$1" =~ "icecast" ]]; then
-  systemctl status icecast
+  systemctl status icecast2
   systemctl status mpd
 #sudo systemctl restart icecast2.service; systemctl status icecast2.service #; restart mpd
 #elif [ "$1" = "icecast" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd

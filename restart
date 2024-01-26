@@ -213,7 +213,7 @@ elif [[ "$1" = "sshd" ]] || [[ "$1" = "ssh" ]]; then
  sudo systemctl restart ssh.service
  sudo systemctl status ssh.service
 
-elif [[ "$1" == "systemd" ]]; then
+elif [[ "$1" == "systemd" ]] || [[ "$1" == "systemctl" ]]; then
  sudo systemctl daemon-reload
 
 else

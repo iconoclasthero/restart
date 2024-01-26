@@ -61,7 +61,8 @@ elif [ "$1" = "alsa" ]; then
  sudo /etc/init.d/alsa-utils status
 
 elif [[ "$1" == "audio" ]] || [[ "$1" == "audiobookshelf" ]] || [[ "$1" == "abs" ]]; then
- remotefn && ${REMOTE:-} systemctl status audiobookshelf
+# remotefn && ${REMOTE:-} systemctl status audiobookshelf
+ remotefn && ${REMOTE:-} docker ps |grep audiobookshelf
 
 ##B
 elif [ "$1" = "bind" ] || [ "$1" = "bind9" ]; then

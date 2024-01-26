@@ -76,7 +76,7 @@ elif [ "$1" = "chrome" ] ; then
 /usr/bin/pkill --oldest --signal TERM -f chrome
 #if $( ps -A|grep chrome )
 while [[ $(ps -A|grep -c chrome) -gt 0 ]] && [[ "$n" -lt 7 ]]; do printf "...chrome still shittig down..." && \sleep 5s; done
-nohup chrome
+nohup google-chrome
 
 
 ##D
@@ -174,7 +174,7 @@ elif [ "$1" = "nginx" ] || [ "$1" = "ngnix" ]; then
      sudo systemctl restart nginx
      systemctl status nginx
 
-elif [ "$1" = "now" ]; then
+elif [[ "$1" = "now" ]] || [[ "$1" == "$(uname -n)" ]]; then
  sudo reboot now
 
 ##P

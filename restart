@@ -131,14 +131,20 @@ elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
    ${REMOTE:-} sudo systemctl restart icecast2.service
    status icecast2
    restart mpd
-   play
+#   play
 
 #echo yes
 #elif [[ "$1" == "ice" ]] || [[ "$1" == "icecast" ]] || [[ "$1" == "icecast2" ]];
 #then
 
 ##J
-elif [[ "$1" == "jelly" ]] || [[ "$1" == "jellyfin" ]]; then ssh 192.168.1.2:"$HOME"/bin/restart jellyfin
+elif [[ "$1" == "jelly" ]] || [[ "$1" == "jellyfin" ]]; then
+  ${REMOTE:-} sudo /usr/bin/systemctl stop jellyfin
+  ${REMOTE:-} /usr/bin/systemctl status jellyfin
+  ${REMOTE:-} sudo /usr/bin/systemctl start jellyfin
+  ${REMOTE:-} /usr/bin/systemctl status jellyfin
+
+#  status jellyfin
 
 
 ##M
@@ -213,7 +219,7 @@ elif [[ "$1" = "sshd" ]] || [[ "$1" = "ssh" ]]; then
  sudo systemctl restart ssh.service
  sudo systemctl status ssh.service
 
-elif [[ "$1" == "systemd" ]] || [[ "$1" == "systemctl" ]]; then
+elif [[ "$1" == "systemd" ]] || [[ "$1" == "systemctl" ]] || [[ "$1" == "daemon" ]]; then
  sudo systemctl daemon-reload
 
 else

@@ -12,7 +12,7 @@ scriptname=$(realpath "$0")
 #Functions
 function error(){
  #read -p "$*"
- printf "Recognized commands are: \nalsa \naudio[bookshelf] - abs \nbind[9] \nchrome \ndeluge[d] \ndocker \nedit \nice[cast][2] \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnow \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
+ printf "Recognized commands are: \nalsa \naudio[bookshelf] - abs \nbind[9] \nchrome \ndeluge[d] \ndocker \nedit \nice[cast][2] \njellyfin \nminidlna (restart, force-reload, rescan) \nmpd \nnetwork/networking/network manager \nnfs \nnow \npipe(wire) \npulse(audio) \nserviio \nshout \nssh[d] \n\n"
  echo "Edit this script in nano, code, or quit?"
  select ncq in "nano" "code" "quit"; do
    case "$ncq" in
@@ -106,6 +106,13 @@ elif [[ "$1" = "ice" ]] || [[ "$1" =~ "icecast" ]]; then
 #elif [ "$1" = "icecast" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
 #elif [ "$1" = "icecast2" ]; then sudo systemctl restart icecast2.service; systemctl status icecast2.service; restart mpd
 
+##J
+elif [[ "$1" = "jelly" ]] || "$1" = "jellyfin" ]]; then
+  ${REMOTE:-} systemctl status jellyfin
+
+##K
+
+##L
 
 ##M
 elif [ "$1" = "minidlna" ]; then

@@ -128,8 +128,8 @@ elif [ "$1" = "edit" ]; then
 ##I
 elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
  then
-   ${REMOTE:-} sudo systemctl restart icecast2.service
-   status icecast2
+   ${REMOTE:-} sudo systemctl restart icecast.service
+   status icecast
    restart mpd
    play
 

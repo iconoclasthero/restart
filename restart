@@ -126,10 +126,10 @@ elif [ "$1" = "edit" ]; then
 #   echo sudo reboot now
 
 ##I
-elif [[ "$1" =~ ^(ice|icecast|icecast2)$ ]]
+elif [[ "$1" =~ ^(ice|icecast|icecast2|shout)$ ]]
  then
-   ${REMOTE:-} sudo systemctl restart icecast.service
-   status icecast
+   ${REMOTE:-} sudo systemctl restart icecast2.service
+   status icecast2
    restart mpd
 #   play
 
@@ -191,7 +191,7 @@ elif [[ "$1" = "picard" ]]; then
  docker stop picard
  docker start picard
 
-elif [[ "$1" = "pipe" ]] || [[ "$1" = "pipewire" ]] || [[ "$1" = "pipewire-pulseaudio" ]]; then
+elif [[ "$1" = "pipe" ]] || [[ "$1" = "pipewire" ]]]; then
  /usr/bin/systemctl --user restart pipewire
  /usr/bin/systemctl --user status pipewire
 
@@ -200,6 +200,9 @@ elif [ "$1" = "pulse" ] || [ "$1" = "pulseaudio" ] || [ "$1" = "pulse-audio" ]; 
  sudo killall pulseaudio
  pulseaudio -k
  pulseaudio --start
+ /usr/bin/systemctl --user restart pipewire-pulse
+
+
 
 ##S
 elif [ "$1" = "serviio" ]; then
@@ -211,7 +214,7 @@ elif [ "$1" = "shout" ]; then #https://www.howtoforge.com/tutorial/ubuntu-shoutc
 # echo "Attempting 'sudo killall sc_serv && sudo sc_serv &,' if it doesn't work try restarting mpd.  See also (https://www.howtoforge.com/tutorial/ubuntu-shoutcast-server/): "
 # sudo killall sc_serv && sudo sc_serv &
  printf "There is no shoutcast server on this machine; restarting icecast server instead!"
- sudo systemctl restart icecast2.service #restart mpd
+ restart icecast2
 
 elif [[ "$1" = "sshd" ]] || [[ "$1" = "ssh" ]]; then
  sudo systemctl restart sshd.service
